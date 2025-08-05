@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Finance Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f8;
+    }
+
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: white;
+      margin-left: 15px;
+      text-decoration: none;
+    }
+
+    .metrics {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      padding: 30px;
+      background-color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .metric {
+      text-align: center;
+      flex: 1;
+      min-width: 180px;
+      margin: 10px 0;
+    }
+
+    .dashboard-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 20px;
+      justify-content: space-between;
+    }
+
+    .chart-box {
+      flex: 1;
+      min-width: 300px;
+      background-color: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    canvas {
+      max-width: 100%;
+      height: 260px !important;
+    }
+
+    .transactions ul {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 0;
+    }
+
+    .transactions li {
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .transactions strong {
+      display: block;
+      color: #2c3e50;
+    }
+
+    .transactions span {
+      font-size: 0.9rem;
+      color: #777;
+    }
+
+    .action-buttons {
+      text-align: center;
+      padding-bottom: 30px;
+    }
+
+    .action-buttons a {
+      margin: 5px;
+    }
+  </style>
+</head>
+<body onload="renderDashboard()">
+
+  <header>
+    <div class="d-flex align-items-center flex-wrap">
+      <h2 class="me-4">📊 Finance Tracker</h2>
+      <div class="nav-links">
+        <a href="add_transaction.html">+ Add Transaction</a>
+        <a href="add_budget.html">+ Add Budget</a>
+      </div>
+    </div>
+    <div class="profile text-end">
+      <strong id="username">Welcome!</strong><br>
+      <small id="logintime"></small>
+    </div>
+  </header>
+
+  <section class="metrics">
+    <div class="metric"><h4>Total Income</h4><p id="totalIncome"></p></div>
+    <div class="metric"><h4>Total Expenses</h4><p id="totalExpense"></p></div>
+    <div class="metric"><h4>Current Balance</h4><p id="balance"></p></div>
+    <div class="metric"><h4>Total Budget</h4><p id="totalBudget"></p></div>
+  </section>
+
+  <section class="dashboard-row">
+    <div class="chart-box">
+      <h5 class="text-center">Pie Chart - Spending by Category</h5>
+      <canvas id="budgetChart"></canvas>
+    </div>
+    <div class="chart-box">
+      <h5 class="text-center">Bar Graph - Budget vs Spent</h5>
+      <canvas id="budgetCompareChart"></canvas>
+    </div>
+    <div class="chart-box transactions">
+      <h5 class="text-center">Recent Transactions</h5>
+      <ul id="recentList"></ul>
+    </div>
+  </section>
+
+  <div class="action-buttons">
+    <a href="index.html" class="btn btn-outline-primary"> Home</a>
+    <button onclick="history.back()" class="btn btn-outline-secondary"> Back</button>
+  </div>
+
+  <script>
+    function renderDashboard() {
+      const username = localStorage.getItem("username") || "User";
+      const loginTime = localStorage.getItem("loginTime") || new Date().toLocaleString();
+      document.getElementById("username").textContent = "👋 " + username;
+      document.getElementById("logintime").textContent = "Logged in at: " + loginTime;
+
+      const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+      const budgets = JSON.parse(localStorage.getItem("budgets")) || [];
+
+      let totalIncome = 0, totalExpense = 0;
+      const expenseByCategory = {};
+      const recentList = document.getElementById("recentList");
+      recentList.innerHTML = '';
+
+      transactions
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 5)
+        .forEach(tx => {
+          const li = document.createElement("li");
+          li.innerHTML = `<strong>${tx.title} (${tx.category})</strong>
+                          <span>$${tx.amount.toFixed(2)} on ${tx.date}</span>`;
+          recentList.appendChild(li);
+        });
+
+      transactions.forEach(tx => {
+        if (tx.type === "income") totalIncome += tx.amount;
+        else {
+          totalExpense += tx.amount;
+          expenseByCategory[tx.category] = (expenseByCategory[tx.category] || 0) + tx.amount;
+        }
+      });
+
+      document.getElementById("totalIncome").textContent = `$${totalIncome.toFixed(2)}`;
+      document.getElementById("totalExpense").textContent = `$${totalExpense.toFixed(2)}`;
+      document.getElementById("balance").textContent = `$${(totalIncome - totalExpense).toFixed(2)}`;
+      document.getElementById("totalBudget").textContent = `$${budgets.reduce((sum, b) => sum + b.amount, 0).toFixed(2)}`;
+
+      // PIE CHART
+      new Chart(document.getElementById("budgetChart"), {
+        type: "pie",
+        data: {
+          labels: Object.keys(expenseByCategory),
+          datasets: [{
+            data: Object.values(expenseByCategory),
+            backgroundColor: ['#3498db','#e74c3c','#f1c40f','#9b59b6','#2ecc71','#34495e']
+          }]
+        },
+        options: {
+          plugins: { legend: { position: 'bottom' } },
+          responsive: true
+        }
+      });
+
+      // BAR CHART
+      const ctx = document.getElementById("budgetCompareChart").getContext("2d");
+      const allCategories = [...new Set([...budgets.map(b => b.category), ...Object.keys(expenseByCategory)])];
+      const budgetData = allCategories.map(cat => budgets.find(b => b.category === cat)?.amount || 0);
+      const actualData = allCategories.map(cat => expenseByCategory[cat] || 0);
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: allCategories,
+          datasets: [
+            { label: 'Budgeted', data: budgetData, backgroundColor: '#3498db' },
+            { label: 'Spent', data: actualData, backgroundColor: '#e74c3c' }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'top' }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

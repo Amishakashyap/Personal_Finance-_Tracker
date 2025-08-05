@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Finance Tracker 💰</title>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2972/2972299.png" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f6f8;
+      scroll-behavior: smooth;
+      line-height: 1.6;
+    }
+    .navbar {
+      background-color: #2c3e50;
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+      padding: 1rem 0;
+    }
+    .navbar-brand {
+      color: #fff !important;
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+    .nav-link {
+      color: #fff !important;
+      transition: color 0.3s;
+      font-weight: 500;
+    }
+    .nav-link:hover,
+    .nav-link.active {
+      color: #3498db !important;
+    }
+    #header {
+      min-height: 90vh;
+      background-color: #374859;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    #quoteBox {
+      max-width: 700px;
+      padding: 3rem;
+      text-align: center;
+    }
+    .quoteBlock {
+      font-size: 2rem;
+      line-height: 1.5;
+      margin-bottom: 2rem;
+      font-weight: 600;
+      color: #f0f8fd;
+    }
+    .btn-primary {
+      background-color: #4CAF50;
+      border: none;
+      font-size: 1.2rem;
+      padding: 0.75rem 2.5rem;
+      border-radius: 50px;
+    }
+    .btn-primary:hover {
+      background-color: #3e8e41;
+    }
+    .overview-section, .insights-section {
+      padding: 80px 20px;
+      text-align: center;
+      background-color: #ffffff;
+    }
+    .insights-section {
+      background-color: #f4f6f8;
+    }
+    .overview-section h2, .insights-section h2 {
+      font-size: 3rem;
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+    .overview-section p, .insights-section p {
+      font-size: 1.2rem;
+      color: #555;
+      max-width: 800px;
+      margin: 0 auto 3rem auto;
+    }
+    .dashboard-preview {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+    }
+    .dashboard-card {
+      background-color: #fff;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      padding: 25px;
+      width: 320px;
+      transition: transform 0.3s;
+    }
+    .dashboard-card:hover {
+      transform: translateY(-10px);
+    }
+    .chart-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 15px;
+    }
+    .columns {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+    }
+    .column {
+      flex: 0 0 320px;
+      min-height: 300px;
+      background-color: #ffffff;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: left;
+    }
+    .column:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+    .columnhead {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: #2c3e50;
+      font-weight: 600;
+    }
+    .column p {
+      font-size: 1rem;
+      color: #666;
+    }
+    .footer {
+      background-color: #2c3e50;
+      color: #f0f8fd;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+    .footer ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+    .footer ul li a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .footer ul li a:hover {
+      color: #3498db;
+    }
+    .back-to-top {
+      display: none;
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background-color: #4CAF50;
+      color: #fff;
+      padding: 10px 15px;
+      border-radius: 50%;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      font-size: 20px;
+      text-decoration: none;
+      z-index: 1000;
+      transition: opacity 0.3s ease-in-out;
+    }
+    .back-to-top:hover {
+      background-color: #3e8e41;
+    }
+    @media (max-width: 768px) {
+      #quoteBox {
+        padding: 2rem;
+        max-width: 90%;
+      }
+      .quoteBlock {
+        font-size: 1.5rem;
+      }
+      .overview-section, .insights-section {
+        padding: 40px 10px;
+      }
+      .overview-section h2, .insights-section h2 {
+        font-size: 2.5rem;
+      }
+      .column {
+        min-height: auto;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" href="#">Finance Tracker 📉</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="#overview">Overview</a></li>
+        <li class="nav-item"><a class="nav-link" href="#insights">Insights</a></li>
+        <li class="nav-item"><a class="nav-link" href="add_budget.html">Add Budget</a></li>
+        <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header id="header">
+  <div class="container d-flex flex-column align-items-center justify-content-center">
+    <div id="quoteBox">
+      <p class="quoteBlock">
+        "Managing your finances is not just about dollars and cents; It's the road to freedom, with mindful expense. Track your savings, watch them grow, so your future self will thank you more than you know."
+      </p>
+      <a href="register.html" class="btn btn-primary btn-lg">Get Started</a>
+    </div>
+  </div>
+</header>
+
+<section id="overview" class="overview-section">
+  <h2>Overview</h2>
+  <p>Visualize the flow of your money at a glance with a fully customizable Overview page. Here you can find the balance of your last days together with the accounts, cards and budgets you use most frequently.</p>
+  <div class="dashboard-preview">
+    <div class="dashboard-card">
+      <div class="chart-title">Income vs Expenses</div>
+      <canvas id="incomeExpensesChart"></canvas>
+    </div>
+    <div class="dashboard-card">
+      <div class="chart-title">Balance Over Time</div>
+      <canvas id="balanceChart"></canvas>
+    </div>
+    <div class="dashboard-card">
+      <div class="chart-title">Budget Distribution</div>
+      <canvas id="budgetChart"></canvas>
+    </div>
+  </div>
+</section>
+
+<section class="insights-section">
+  <h2>Budget Insights</h2>
+  <p>Get a deeper understanding of your weekly, monthly, and yearly budgets. Analyze spending trends across categories and time with smart analytics.</p>
+  <div class="dashboard-preview">
+    <div class="dashboard-card">
+      <img src="image2.png" alt="Custom Budget Categories" class="img-fluid" style="width:100%; height: auto; " />
+      <div style="padding: 15px;">
+        <div class="chart-title">Custom Monthly Budgets Overview</div>
+      </div>
+    </div>
+    <div class="dashboard-card">
+      <img src="image 1.png" alt="Finance Chart" class="img-fluid" style="width:100%; height:auto;" />
+      <div style="padding: 15px;">
+        <div class="chart-title">Budget Categories & Transactions</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="insights" class="overview-section">
+  <h2>Key Financial Insights 🔍</h2>
+  <div class="columns">
+    <div class="column">
+      <h3 class="columnhead">Understanding Budget Leaks 🚰</h3>
+      <p>Budget leaks occur when small, unnoticed expenses accumulate over time, diminishing your savings. Track these hidden costs using finance tools to keep your spending in check.</p>
+    </div>
+    <div class="column">
+      <h3 class="columnhead">Corporate Impact 📈</h3>
+      <p>Be aware of how large-scale businesses and economic policies can affect personal finance. From inflation to interest rates, these factors play a significant role in your financial strategy.</p>
+    </div>
+    <div class="column">
+      <h3 class="columnhead">Smart Saving Strategies 💡</h3>
+      <p>Invest in your future by understanding different savings vehicles, such as high-yield savings accounts and retirement plans. Being proactive helps secure long-term growth.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>Finance Tracker &copy; 2025 | All Rights Reserved</p>
+  <ul>
+    <li><a href="#overview">Overview 📘</a></li>
+    <li><a href="#insights">Insights 💡</a></li>
+    <li><a href="#header">Back to Top ⬆️</a></li>
+  </ul>
+</footer>
+
+<a href="#header" id="backToTop" class="back-to-top">↑ Top</a>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Chart.js script logic
+  const incomeExpensesChart = new Chart(document.getElementById('incomeExpensesChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      datasets: [
+        {
+          label: 'Income',
+          backgroundColor: '#4CAF50',
+          data: [200, 300, 250, 400, 500, 450, 600]
+        },
+        {
+          label: 'Expenses',
+          backgroundColor: '#e74c3c',
+          data: [150, 200, 300, 250, 400, 300, 350]
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }
+  });
+
+  const balanceChart = new Chart(document.getElementById('balanceChart'), {
+    type: 'line',
+    data: {
+      labels: ['May 1', 'May 5', 'May 10', 'May 15', 'May 20', 'May 25', 'May 30'],
+      datasets: [{
+        label: 'Balance',
+        borderColor: '#3498db',
+        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+        data: [1000, 1200, 1100, 1500, 1700, 1600, 1800],
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false
+        }
+      }
+    }
+  });
+
+  const budgetChart = new Chart(document.getElementById('budgetChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Food', 'Transport', 'Utilities', 'Entertainment', 'Savings'],
+      datasets: [{
+        data: [20, 15, 25, 10, 30],
+        backgroundColor: ['#e74c3c', '#f1c40f', '#3498db', '#9b59b6', '#4CAF50'],
+        hoverOffset: 10
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }
+  });
+
+  // Scroll animations and back to top button logic
+  document.addEventListener("scroll", () => {
+    document.querySelectorAll(".overview-section, .insights-section").forEach(section => {
+      const rect = section.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.9) {
+        section.classList.add("animate");
+      }
+    });
+  });
+  window.addEventListener("scroll", function () {
+    const backToTop = document.getElementById("backToTop");
+    backToTop.style.display = window.pageYOffset > 100 ? "block" : "none";
+  });
+</script>
+</body>
+</html>
